@@ -1,1 +1,2 @@
-Sample readme file for clib project.
+# clib  A rapid development library for C .
+
