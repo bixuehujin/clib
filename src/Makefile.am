@@ -7,7 +7,8 @@ libclib_a_SOURCES=\
 	bitmap.c \
 	quark.c \
 	sort.c \
-	timer.c
+	timer.c \
+	cerror.c
 
  
 libclib_a_CFLAGS = -I../include
