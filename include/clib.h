@@ -17,5 +17,6 @@
 #include <clib/cerror.h>
 #include <clib/core.h>
 #include <clib/quark.h>
+#include <clib/timer.h>
 
 #endif /* CLIB_H_ */

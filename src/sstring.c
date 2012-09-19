@@ -106,9 +106,12 @@ sstring_t * sstring_appendl(sstring_t *ss, const char * str, size_t len) {
 	}
 
 	p = nptr + ss_len;
-	while((*(p ++) = *(str ++)) != '\0');
+
+	memcpy(p, str, len);
 
 	ss->len += len;
+	ss->ptr[ss->len] = 0;
+
 	return ss;
 }
 
