@@ -14,7 +14,7 @@
 
 
 
-inline ulong hash_func(string key, uint key_len) {
+static inline ulong hash_func(string key, uint key_len) {
 	ulong hash = 31;
 	int i;
 	for(i=0;key[i] != 0; i ++) {
@@ -24,19 +24,77 @@ inline ulong hash_func(string key, uint key_len) {
 }
 
 
-hash_table_t * hash_table_new(int size, hash_table_dtor_func_t dtor) {
+static inline uint get_table_size(uint size) {
+	uint i = 3;
+	uint ret;
+
+	if (size >= 0x80000000) {
+		/* prevent overflow */
+		ret = 0x80000000;
+	} else {
+		while ((1U << i) < size) {
+			i++;
+		}
+		ret = 1 << i;
+	}
+	return ret;
+}
+
+
+hash_table_t * hash_table_new(uint size, hash_table_dtor_func_t dtor) {
 	hash_table_t * ht = malloc(sizeof(hash_table_t));
 	if(!ht) return NULL;
 
 	ht->dtor = dtor;
 
 	ht->size = 0;
-	ht->bucket_size = size;
+	ht->bucket_size = get_table_size(size);
+	ht->table_mask = ht->bucket_size - 1;
 	ht->curr = NULL;
 	ht->head = NULL;
 	ht->tail = NULL;
-	ht->bucket = calloc(sizeof(hash_bucket_t *), ht->bucket_size);
+	ht->buckets = calloc(sizeof(hash_bucket_t *), ht->bucket_size);
 	return ht;
+}
+
+
+hash_table_t * hash_table_init(hash_table_t * ht, uint size, hash_table_dtor_func_t dtor) {
+	ht->dtor = dtor;
+
+	ht->size = 0;
+	ht->bucket_size = get_table_size(size);
+	ht->curr = NULL;
+	ht->head = NULL;
+	ht->tail = NULL;
+	ht->buckets = calloc(sizeof(hash_table_t *), ht->bucket_size);
+	return ht;
+}
+
+
+void hash_table_rehash(hash_table_t * ht) {
+	ht->bucket_size += ht->bucket_size;
+	ht->table_mask = ht->bucket_size - 1;
+	ht->buckets = realloc(ht->buckets, ht->bucket_size);
+	memset(ht->buckets, 0, ht->bucket_size * sizeof(hash_bucket_t *));
+
+	hash_bucket_t * bucket = ht->head;
+	hash_bucket_t ** buckets = ht->buckets;
+	hash_bucket_t * tmp;
+	ulong bidx;
+
+	while(bucket) {
+		bidx = bucket->idx & ht->table_mask;
+		if(buckets[bidx]) {
+			tmp = buckets[bidx];
+			while(tmp->next) {
+				tmp = tmp->next;
+			}
+			tmp->next = bucket;
+		}else {
+			buckets[bidx] = bucket;
+		}
+		bucket = bucket->elem_next;
+	}
 }
 
 
@@ -62,9 +120,9 @@ bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointe
 	memcpy(nb->key, key, key_size);
 
 
-	hash_bucket_t * bucket = ht->bucket[bidx];
+	hash_bucket_t * bucket = ht->buckets[bidx];
 	if(!bucket) {
-		ht->bucket[bidx] = nb;
+		ht->buckets[bidx] = nb;
 	}else{// 冲突解决
 		while(bucket->next) {
 			bucket = bucket->next;
@@ -78,13 +136,19 @@ bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointe
 	}
 
 	ht->size ++;
+
+	/* rehash the table when necessary */
+	if(ht->size >= ht->bucket_size) {
+		hash_table_rehash(ht);
+	}
+
 	return true;
 }
 
 
 pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_size, ulong idx) {
 	ulong  bidx = idx % (ht->bucket_size);
-	hash_bucket_t * bucket = ht->bucket[bidx];
+	hash_bucket_t * bucket = ht->buckets[bidx];
 	if(!bucket) {
 		return NULL;
 	}
@@ -96,13 +160,12 @@ pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_si
 		bucket = bucket->next;
 	}
 	return NULL;
-
 }
 
 
 bool hash_table_sized_quick_remove(hash_table_t * ht, string key, size_t key_size, ulong idx) {
 	ulong bidx = idx % ht->bucket_size;
-	hash_bucket_t * bucket = ht->bucket[bidx], *tmp;
+	hash_bucket_t * bucket = ht->buckets[bidx], *tmp;
 
 	if(!bucket) {
 		return false;
@@ -128,10 +191,10 @@ found:
 	}
 
 	// remove the bucket from conflict list .
-	if(ht->bucket[bidx] == bucket) {
-		ht->bucket[bidx] = bucket->next;
+	if(ht->buckets[bidx] == bucket) {
+		ht->buckets[bidx] = bucket->next;
 	}else {
-		tmp = ht->bucket[bidx];
+		tmp = ht->buckets[bidx];
 		while(tmp->next && tmp->next != bucket) {
 			break;
 			tmp = tmp->next;
@@ -157,7 +220,7 @@ bool hash_table_sized_remove(hash_table_t *ht, string key, size_t key_size) {
 
 bool hash_table_sized_quick_key_exist(hash_table_t * ht, string key, size_t key_size, ulong idx) {
 	ulong bidx = idx % ht->bucket_size;
-	hash_bucket_t * bucket = ht->bucket[bidx];
+	hash_bucket_t * bucket = ht->buckets[bidx];
 	if(!bucket) {
 		return false;
 	}
@@ -205,7 +268,7 @@ void hash_table_clear(hash_table_t * ht) {
 		idx = bucket->idx;
 		tmp = bucket->elem_next;
 		free(bucket);
-		ht->bucket[idx % ht->bucket_size] = NULL;
+		ht->buckets[idx % ht->bucket_size] = NULL;
 		bucket = tmp;
 	}
 	ht->head = ht->tail = NULL;
@@ -217,8 +280,15 @@ void hash_table_clear(hash_table_t * ht) {
 void hash_table_free(hash_table_t * ht) {
 	assert(ht != NULL);
 	hash_table_clear(ht);
-	free(ht->bucket);
+	free(ht->buckets);
 	free(ht);
+}
+
+
+void hash_table_destroy(hash_table_t *ht) {
+	assert(ht != NULL);
+	hash_table_clear(ht);
+	free(ht->buckets);
 }
 
 

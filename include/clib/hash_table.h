@@ -23,9 +23,10 @@ typedef struct _hash_bucket{
 }hash_bucket_t;
 
 typedef struct _hash_table{
-	int size;
-	int bucket_size;
-	hash_bucket_t ** bucket;
+	uint size;
+	uint bucket_size;
+	uint table_mask;
+	hash_bucket_t ** buckets;
 	hash_bucket_t * head;
 	hash_bucket_t * tail;
 	hash_bucket_t * curr; /* internal pointer for iterator */
@@ -54,9 +55,12 @@ typedef struct _hash_table{
 	hash_table_sized_quick_key_exist(ht, key, strlen(key) + 1, idx)
 
 
-hash_table_t * hash_table_new(int size, hash_table_dtor_func_t dtor);
+hash_table_t * hash_table_new(uint size, hash_table_dtor_func_t dtor);
+hash_table_t * hash_table_init(hash_table_t * ht, uint size, hash_table_dtor_func_t dtor);
+
 void hash_table_clear(hash_table_t * ht);
 void hash_table_free(hash_table_t * ht);
+void hash_table_destroy(hash_table_t *ht);
 
 void hash_table_rehash(hash_table_t * ht);
 
@@ -72,7 +76,7 @@ bool hash_table_sized_quick_key_exist(hash_table_t * ht, string key, size_t key_
 bool hash_table_sized_key_exist(hash_table_t *ht, string key, size_t key_size);
 
 void hash_table_apply(hash_table_t * ht, hash_table_apply_func_t func, bool reverse);
-
+void hash_table_rehash(hash_table_t * ht);
 
 /*****************************************/
 /*            iterators                  */
