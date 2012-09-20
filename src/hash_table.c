@@ -42,7 +42,7 @@ hash_table_t * hash_table_new(int size, hash_table_dtor_func_t dtor) {
 
 bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointer data){
 	ulong idx = hash_func(key, key_size);
-	ulong bidx = idx % (ht->bucket_size - 1);
+	ulong bidx = idx % (ht->bucket_size);
 	hash_bucket_t * nb = malloc(sizeof(hash_bucket_t) + key_size);
 	if(!nb) return false;
 
@@ -78,19 +78,20 @@ bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointe
 
 
 pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_size, ulong idx) {
-	ulong  bidx = idx % (ht->bucket_size - 1);
+	ulong  bidx = idx % (ht->bucket_size);
 	hash_bucket_t * bucket = ht->bucket[bidx];
 	if(!bucket) {
 		return NULL;
-	}else {
-		while(bucket) {
-			if(strcmp(bucket->key, key) == 0) {
-				break;
-			}
-			bucket = bucket->next;
-		}
-		return bucket->data;
 	}
+
+	while(bucket) {
+		if(strcmp(bucket->key, key) == 0) {
+			return bucket->data;
+		}
+		bucket = bucket->next;
+	}
+	return NULL;
+
 }
 
 
