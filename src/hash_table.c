@@ -35,7 +35,7 @@ hash_table_t * hash_table_new(int size, hash_table_dtor_func_t dtor) {
 	ht->curr = NULL;
 	ht->head = NULL;
 	ht->tail = NULL;
-	ht->bucket = calloc(sizeof(hash_bucket_t *) * ht->bucket_size, 1);
+	ht->bucket = calloc(sizeof(hash_bucket_t *), ht->bucket_size);
 	return ht;
 }
 
@@ -121,7 +121,7 @@ void hash_table_clear(hash_table_t * ht) {
 		idx = bucket->idx;
 		tmp = bucket->elem_next;
 		free(bucket);
-		ht->bucket[idx % ht->bucket_size - 1] = NULL;
+		ht->bucket[idx % ht->bucket_size] = NULL;
 		bucket = tmp;
 	}
 	ht->head = ht->tail = NULL;

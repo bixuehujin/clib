@@ -21,7 +21,7 @@ typedef struct _sstring{
 	(((pss)->ptr == NULL || (pss)->len == 0))
 
 #define sstring_for_init 												\
-	{0, 0, 0, NULL}
+	{0, 200, 0, NULL}
 
 
 sstring_t * sstring_new(size_t size);

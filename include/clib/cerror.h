@@ -16,7 +16,7 @@ typedef struct _cerror{
 	char * msg;
 }cerror_t;
 
-cerror_t * cerror_new();
+cerror_t * cerror_new(const char * domain, int code, char * msg);
 void cerror_print(cerror_t * error);
 void cerror_fprint(cerror_t * error, int fd);
 void cerror_free(cerror_t ** error);
