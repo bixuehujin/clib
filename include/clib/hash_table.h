@@ -28,7 +28,7 @@ typedef struct _hash_table{
 	hash_bucket_t ** bucket;
 	hash_bucket_t * head;
 	hash_bucket_t * tail;
-	hash_bucket_t * curr;
+	hash_bucket_t * curr; /* internal pointer for iterator */
 	hash_table_dtor_func_t dtor;
 }hash_table_t;
 
@@ -72,5 +72,18 @@ bool hash_table_sized_quick_key_exist(hash_table_t * ht, string key, size_t key_
 bool hash_table_sized_key_exist(hash_table_t *ht, string key, size_t key_size);
 
 void hash_table_apply(hash_table_t * ht, hash_table_apply_func_t func, bool reverse);
+
+
+/*****************************************/
+/*            iterators                  */
+/*****************************************/
+
+
+void hash_table_rewind(hash_table_t *ht);
+bool hash_table_current(hash_table_t * ht);
+char * hash_table_current_key(hash_table_t * ht);
+pointer hash_table_current_data(hash_table_t * ht);
+void hash_table_next(hash_table_t * ht);
+void hash_table_prev(hash_table_t * ht);
 
 #endif /* HASH_TABLE_H_ */

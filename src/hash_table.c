@@ -72,6 +72,11 @@ bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointe
 		bucket->next = nb;
 	}
 
+	/* make  ht->curr point to the first element of hash table, for iterator use . */
+	if(ht->size == 0) {
+		ht->curr = nb;
+	}
+
 	ht->size ++;
 	return true;
 }
@@ -132,6 +137,11 @@ found:
 			tmp = tmp->next;
 		}
 		tmp->next = bucket->next;
+	}
+
+	/* if the deleting bucket is ht->curr, move the ht->curr forward . */
+	if(ht->curr == bucket) {
+		ht->curr = ht->curr->elem_next;
 	}
 
 	free(bucket);
@@ -209,4 +219,55 @@ void hash_table_free(hash_table_t * ht) {
 	hash_table_clear(ht);
 	free(ht->bucket);
 	free(ht);
+}
+
+
+/*****************************************/
+/*  iterator APIs for hash table         */
+/*****************************************/
+
+
+/**
+ * reset internal current pointer .
+ */
+inline void hash_table_rewind(hash_table_t *ht) {
+	ht->curr = ht->head;
+}
+
+
+/**
+ * whether has current data
+ */
+inline bool hash_table_current(hash_table_t * ht) {
+	return ht->curr ? true : false;
+}
+
+
+inline char * hash_table_current_key(hash_table_t * ht) {
+	return ht->curr->key;
+}
+
+
+inline  pointer hash_table_current_data(hash_table_t * ht) {
+	return ht->curr->data;
+}
+
+
+/**
+ * move internal pointer forward
+ */
+inline void hash_table_next(hash_table_t * ht) {
+	if(ht->curr) {
+		ht->curr = ht->curr->elem_next;
+	}
+}
+
+
+/**
+ * move internal pointer backword.
+ */
+inline void hash_table_prev(hash_table_t * ht) {
+	if(ht->curr) {
+		ht->curr = ht->curr->elem_prev;
+	}
 }
