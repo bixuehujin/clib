@@ -38,9 +38,20 @@ typedef struct _hash_table{
 
 #define hash_table_find(ht, key) \
 	hash_table_sized_find(ht, key, strlen(key) + 1)
-
 #define hash_table_quick_find(ht, key, idx) \
 	hash_table_sized_quick_find(ht, key, strlen(key) + 1, idx)
+
+
+#define hash_table_remove(ht, key) \
+	hash_table_sized_remove(ht, key, strlen(key) + 1)
+#define hash_table_quick_remove(ht, key, idx) \
+	hash_table_sized_quick_remove(ht, key, strlen(key) + 1, idx)
+
+
+#define hash_table_key_exist(ht, key) \
+	hash_table_sized_key_exist(ht, strlen(key) + 1, idx)
+#define hash_table_quick_key_exist(ht, key, idx) \
+	hash_table_sized_quick_key_exist(ht, key, strlen(key) + 1, idx)
 
 
 hash_table_t * hash_table_new(int size, hash_table_dtor_func_t dtor);
@@ -50,10 +61,15 @@ void hash_table_free(hash_table_t * ht);
 void hash_table_rehash(hash_table_t * ht);
 
 bool hash_table_sized_insert(hash_table_t * ht, string key, int key_len, pointer data);
-bool hash_table_remove(hash_table_t * ht, string key, int key_len);
 
 pointer hash_table_sized_find(hash_table_t * ht, string key, size_t key_size);
 pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_size, ulong idx);
+
+bool hash_table_sized_quick_remove(hash_table_t * ht, string key, size_t key_size, ulong idx);
+bool hash_table_sized_remove(hash_table_t *ht, string key, size_t key_size);
+
+bool hash_table_sized_quick_key_exist(hash_table_t * ht, string key, size_t key_size, ulong idx);
+bool hash_table_sized_key_exist(hash_table_t *ht, string key, size_t key_size);
 
 void hash_table_apply(hash_table_t * ht, hash_table_apply_func_t func, bool reverse);
 

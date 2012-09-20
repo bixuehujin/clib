@@ -14,7 +14,7 @@
 
 
 
-ulong hash_func(string key, uint key_len) {
+inline ulong hash_func(string key, uint key_len) {
 	ulong hash = 31;
 	int i;
 	for(i=0;key[i] != 0; i ++) {
@@ -92,6 +92,79 @@ pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_si
 	}
 	return NULL;
 
+}
+
+
+bool hash_table_sized_quick_remove(hash_table_t * ht, string key, size_t key_size, ulong idx) {
+	ulong bidx = idx % ht->bucket_size;
+	hash_bucket_t * bucket = ht->bucket[bidx], *tmp;
+
+	if(!bucket) {
+		return false;
+	}
+	while(bucket) {
+		if(strcmp(bucket->key, key) == 0) {
+			goto found;
+		}
+	}
+
+	return false;
+
+found:
+
+	if(ht->head == bucket) {//found bucket is the head of the doubly linked list .
+		ht->head = bucket->elem_next;
+	}else if(ht->tail == bucket){
+		ht->tail = bucket->elem_prev;
+	}else {
+		tmp = bucket;
+		bucket->elem_prev->elem_next = tmp->elem_next;
+		bucket->elem_next->elem_prev = tmp->elem_prev;
+	}
+
+	// remove the bucket from conflict list .
+	if(ht->bucket[bidx] == bucket) {
+		ht->bucket[bidx] = bucket->next;
+	}else {
+		tmp = ht->bucket[bidx];
+		while(tmp->next && tmp->next != bucket) {
+			break;
+			tmp = tmp->next;
+		}
+		tmp->next = bucket->next;
+	}
+
+	free(bucket);
+	return true;
+}
+
+
+bool hash_table_sized_remove(hash_table_t *ht, string key, size_t key_size) {
+	ulong idx = hash_func(key, key_size);
+	return hash_table_sized_quick_remove(ht, key, key_size, idx);
+}
+
+
+bool hash_table_sized_quick_key_exist(hash_table_t * ht, string key, size_t key_size, ulong idx) {
+	ulong bidx = idx % ht->bucket_size;
+	hash_bucket_t * bucket = ht->bucket[bidx];
+	if(!bucket) {
+		return false;
+	}
+
+	while(bucket) {
+		if(strcmp(bucket->key, key) == 0) {
+			return true;
+		}
+		bucket = bucket->next;
+	}
+	return false;
+}
+
+
+bool hash_table_sized_key_exist(hash_table_t *ht, string key, size_t key_size) {
+	ulong idx = hash_func(key, key_size);
+	return hash_table_sized_quick_key_exist(ht, key, key_size, idx);
 }
 
 
