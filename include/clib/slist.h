@@ -60,4 +60,8 @@ void slist_reverse_from_node(slist_node_t ** node);
 
 void slist_string_dtor_func(pointer data);
 
+pointer slist_head(slist_t * list);
+pointer slist_tail(slist_t * list);
+void slist_remove_head(slist_t * list);
+
 #endif /* SLIST_H_ */

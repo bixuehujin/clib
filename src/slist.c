@@ -121,3 +121,23 @@ void slist_print_node(slist_node_t *node, slist_apply_func_t func) {
 
 
 
+pointer slist_head(slist_t * list) {
+	return (pointer) list->head->data;
+}
+
+
+pointer slist_tail(slist_t * list) {
+	return (pointer) list->tail->data;
+}
+
+
+void slist_remove_head(slist_t * list) {
+	slist_node_t * tmp = list->head;
+	if(!tmp) {
+		return;
+	}
+	list->head = list->head->next;
+	if(list->dtor) {
+		list->dtor(tmp);
+	}
+}
