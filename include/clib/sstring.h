@@ -32,6 +32,7 @@ sstring_t * sstring_append(sstring_t * ss, const char * str);
 sstring_t * sstring_appendl(sstring_t * ss, const char * str, size_t len);
 sstring_t * sstring_appends(sstring_t * ss, sstring_t ass);
 sstring_t * sstring_fappend(sstring_t * ss, const char * format, ...);
+sstring_t * sstring_vappend(sstring_t * ss, const char * format, va_list va);
 void sstring_destroy(sstring_t * ss);
 void sstring_free(sstring_t * ss);
 

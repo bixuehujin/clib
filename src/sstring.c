@@ -166,6 +166,41 @@ sstring_t * sstring_fappend(sstring_t * ss, const char * format, ...) {
 }
 
 
+sstring_t * sstring_vappend(sstring_t * ss, const char * format, va_list va) {
+	sstring_alloc(ss);
+	va_list orignal_va;
+	va_copy(orignal_va, va);
+
+	int n;
+	size_t ss_len = ss->len;
+	int buffsize = ss->_alloc - ss_len;
+
+	n = vsnprintf(ss->ptr + ss_len, buffsize, format, va);
+
+	if(n < 0) return NULL;
+
+	if(n >= buffsize) { //memory truncated , do realloc.
+		int c = (n + ss_len) / ss->_alloc + 1;
+		char * nptr = NULL;
+
+		nptr = sstring_realloc(ss, ss->_alloc * c);
+
+		if(!nptr) return NULL;
+
+		ss->ptr = nptr;
+	}
+	buffsize = ss->_alloc - ss_len;
+
+
+
+	n = vsnprintf(ss->ptr + ss_len, buffsize, format, orignal_va);
+	if(n < 0) return NULL;
+
+	ss->len += n;
+	return ss;
+}
+
+
 sstring_t * sstring_appendc(sstring_t * ss, char c) {
 	assert(ss != NULL);
 	sstring_alloc(ss);
