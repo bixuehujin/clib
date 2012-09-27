@@ -122,7 +122,12 @@ void slist_print_node(slist_node_t *node, slist_apply_func_t func) {
 
 
 pointer slist_head(slist_t * list) {
-	return (pointer) list->head->data;
+	if(list->head) {
+		return (pointer) list->head->data;
+	}else {
+		return NULL;
+	}
+
 }
 
 

@@ -64,4 +64,6 @@ pointer slist_head(slist_t * list);
 pointer slist_tail(slist_t * list);
 void slist_remove_head(slist_t * list);
 
+#define slist_to_pointer(pdata, type) 			(type *)(*((size_t *)pdata));
+
 #endif /* SLIST_H_ */

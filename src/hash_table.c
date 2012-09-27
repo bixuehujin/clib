@@ -63,6 +63,7 @@ hash_table_t * hash_table_init(hash_table_t * ht, uint size, hash_table_dtor_fun
 
 	ht->size = 0;
 	ht->bucket_size = get_table_size(size);
+	ht->table_mask = ht->bucket_size - 1;
 	ht->curr = NULL;
 	ht->head = NULL;
 	ht->tail = NULL;
@@ -100,7 +101,7 @@ void hash_table_rehash(hash_table_t * ht) {
 
 bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointer data){
 	ulong idx = hash_func(key, key_size);
-	ulong bidx = idx % (ht->bucket_size);
+	ulong bidx = idx & ht->table_mask;
 	hash_bucket_t * nb = malloc(sizeof(hash_bucket_t) + key_size);
 	if(!nb) return false;
 
@@ -147,13 +148,12 @@ bool hash_table_sized_insert(hash_table_t * ht, string key, int key_size, pointe
 
 
 pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_size, ulong idx) {
-	ulong  bidx = idx % (ht->bucket_size);
+	ulong  bidx = idx & ht->table_mask;
 	hash_bucket_t * bucket = ht->buckets[bidx];
-	if(!bucket) {
-		return NULL;
-	}
 
 	while(bucket) {
+
+		printf("key:%s\n", bucket->key);
 		if(strcmp(bucket->key, key) == 0) {
 			return bucket->data;
 		}
@@ -164,7 +164,7 @@ pointer hash_table_sized_quick_find(hash_table_t * ht, string key, size_t key_si
 
 
 bool hash_table_sized_quick_remove(hash_table_t * ht, string key, size_t key_size, ulong idx) {
-	ulong bidx = idx % ht->bucket_size;
+	ulong bidx = idx & ht->table_mask;
 	hash_bucket_t * bucket = ht->buckets[bidx], *tmp;
 
 	if(!bucket) {
@@ -219,7 +219,7 @@ bool hash_table_sized_remove(hash_table_t *ht, string key, size_t key_size) {
 
 
 bool hash_table_sized_quick_key_exist(hash_table_t * ht, string key, size_t key_size, ulong idx) {
-	ulong bidx = idx % ht->bucket_size;
+	ulong bidx = idx & ht->table_mask;
 	hash_bucket_t * bucket = ht->buckets[bidx];
 	if(!bucket) {
 		return false;
@@ -268,7 +268,7 @@ void hash_table_clear(hash_table_t * ht) {
 		idx = bucket->idx;
 		tmp = bucket->elem_next;
 		free(bucket);
-		ht->buckets[idx % ht->bucket_size] = NULL;
+		ht->buckets[idx & ht->table_mask] = NULL;
 		bucket = tmp;
 	}
 	ht->head = ht->tail = NULL;
