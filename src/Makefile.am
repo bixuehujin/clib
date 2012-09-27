@@ -8,7 +8,8 @@ libclib_a_SOURCES=\
 	quark.c \
 	sort.c \
 	timer.c \
-	cerror.c
+	cerror.c \
+	logger.c
 
  
 libclib_a_CFLAGS = -I../include

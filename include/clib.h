@@ -18,5 +18,6 @@
 #include <clib/core.h>
 #include <clib/quark.h>
 #include <clib/timer.h>
+#include <clib/logger.h>
 
 #endif /* CLIB_H_ */
