@@ -46,9 +46,21 @@ typedef struct _logger_handlers{
 	logger_shutdown_func shutdown;
 }logger_handlers_t;
 
-logger_t * logger_init(logger_t * logger, const char * ident, uint nhandlers, ...);
+logger_t * _logger_init(logger_t * logger, const char * ident, ...);
 void logger_write(logger_t * logger, int level, const char * format, ...);
 void logger_shutdown(logger_t * logger);
+
+#define logger_init(logger, ident, ...)      _logger_init(logger, ident, ##__VA_ARGS__, NULL)
+
+#define logger_warn(logger, format, ...)     logger_write(logger, LOGGER_WARNING, format, __VA_ARGS__)
+#define logger_info(logger, format, ...)     logger_write(logger, LOGGER_INFO, format, __VA_ARGS__)
+#define logger_debug(logger, format, ...)    logger_write(logger, LOGGER_DEBUG, format, __VA_ARGS__)
+#define logger_error(logger, format, ...)    logger_write(logger, LOGGER_ERR, format, __VA_ARGS__)
+#define logger_notice(logger, format, ...)   logger_write(logger, LOGGER_NOTICE, format, __VA_ARGS__)
+#define logger_alert(logger, format, ...)    logger_write(logger, LOGGER_ALERT, format, __VA_ARGS__)
+#define logger_crit(logger, format, ...)     logger_write(logger, LOGGER_CRIT, format, __VA_ARGS__)
+#define logger_emerg(logger, format, ...)    logger_write(logger, LOGGER_EMERG, format, __VA_ARGS__)
+
 
 /* syslog handlers */
 void logger_syslog_init(logger_t * logger);
@@ -59,5 +71,18 @@ void logger_syslog_shutdown(logger_t * logger);
 void logger_stderr_init(logger_t * logger);
 void logger_stderr_write(logger_t * logger, int level, const char * format, va_list va);
 void logger_stderr_shutdown(logger_t * logger);
+
+
+static logger_handlers_t logger_syslog_handlers = {
+	.init = logger_syslog_init,
+	.write = logger_syslog_write,
+	.shutdown = logger_syslog_shutdown
+};
+
+static logger_handlers_t logger_stderr_handlers = {
+	.init = logger_stderr_init,
+	.write = logger_stderr_write,
+	.shutdown = logger_stderr_shutdown
+};
 
 #endif /* LOGGER_H_ */
