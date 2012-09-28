@@ -14,6 +14,7 @@
 #include "clib/sstring.h"
 #include "clib/logger.h"
 
+static logger_t global_logger;
 
 #define call_handlers(hander_name, ...) 										\
 	do{																			\
@@ -30,8 +31,8 @@
 /**
  * initialize a logger object with n handers. the last argument must be NULL.
  */
-logger_t * _logger_init(logger_t * logger,const char * ident , ...) {
-	assert(logger != NULL);
+logger_t * _logger_init(const char * ident , ...) {
+	logger_t * logger = &global_logger;
 	logger->nhandlers = 0;
 	strncpy(logger->ident, ident, sizeof(logger->ident) - 1);
 	logger->ident[15] = '\0';
@@ -55,7 +56,8 @@ logger_t * _logger_init(logger_t * logger,const char * ident , ...) {
 /**
  * write a logger line to registered back-ends.
  */
-void logger_write(logger_t * logger,int level ,const char * format, ...) {
+void logger_write(int level ,const char * format, ...) {
+	logger_t * logger = &global_logger;
 	va_list va;
 	va_start(va, format);
 	call_handlers(write, logger, level, format, va);
@@ -63,7 +65,8 @@ void logger_write(logger_t * logger,int level ,const char * format, ...) {
 }
 
 
-void logger_shutdown(logger_t * logger) {
+void logger_shutdown() {
+	logger_t * logger = &global_logger;
 	assert(logger != NULL);
 	call_handlers(shutdown, logger);
 }

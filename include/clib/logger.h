@@ -57,19 +57,19 @@ struct _logger{
 };
 
 /* logger interfaces */
-logger_t * _logger_init(logger_t * logger, const char * ident, ...);
-void logger_write(logger_t * logger, int level, const char * format, ...);
-void logger_shutdown(logger_t * logger);
-#define logger_init(logger, ident, ...)      _logger_init(logger, ident, ##__VA_ARGS__, NULL)
+logger_t * _logger_init(const char * ident, ...);
+void logger_write(int level, const char * format, ...);
+void logger_shutdown();
+#define logger_init(ident, ...)      _logger_init(ident, ##__VA_ARGS__, NULL)
 
-#define logger_warn(logger, format, ...)     logger_write(logger, LOGGER_WARNING, format, ##__VA_ARGS__)
-#define logger_info(logger, format, ...)     logger_write(logger, LOGGER_INFO, format, ##__VA_ARGS__)
-#define logger_debug(logger, format, ...)    logger_write(logger, LOGGER_DEBUG, format, ##__VA_ARGS__)
-#define logger_error(logger, format, ...)    logger_write(logger, LOGGER_ERR, format, ##__VA_ARGS__)
-#define logger_notice(logger, format, ...)   logger_write(logger, LOGGER_NOTICE, format, ##__VA_ARGS__)
-#define logger_alert(logger, format, ...)    logger_write(logger, LOGGER_ALERT, format, ##__VA_ARGS__)
-#define logger_crit(logger, format, ...)     logger_write(logger, LOGGER_CRIT, format, ##__VA_ARGS__)
-#define logger_emerg(logger, format, ...)    logger_write(logger, LOGGER_EMERG, format, ##__VA_ARGS__)
+#define logger_warn(format, ...)     logger_write(LOGGER_WARNING, format, ##__VA_ARGS__)
+#define logger_info(format, ...)     logger_write(LOGGER_INFO, format, ##__VA_ARGS__)
+#define logger_debug(format, ...)    logger_write(LOGGER_DEBUG, format, ##__VA_ARGS__)
+#define logger_error(format, ...)    logger_write(LOGGER_ERR, format, ##__VA_ARGS__)
+#define logger_notice(format, ...)   logger_write(LOGGER_NOTICE, format, ##__VA_ARGS__)
+#define logger_alert(format, ...)    logger_write(LOGGER_ALERT, format, ##__VA_ARGS__)
+#define logger_crit(format, ...)     logger_write(LOGGER_CRIT, format, ##__VA_ARGS__)
+#define logger_emerg(format, ...)    logger_write(LOGGER_EMERG, format, ##__VA_ARGS__)
 
 
 /* syslog handlers */

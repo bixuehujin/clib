@@ -9,15 +9,14 @@
 
 int main(int argc, char **argv) {
 
-	logger_t logger;
-	logger_init(&logger, "test-logger", &logger_syslog_handlers, &logger_stderr_handlers);
+	logger_init("test-logger", &logger_syslog_handlers, &logger_stderr_handlers);
 
-	logger_warn(&logger, "a warn log message");
-	logger_info(&logger, "a info log message");
-	logger_error(&logger, "a error log message");
-	logger_notice(&logger, "a notice log message");
+	logger_warn("a warn log message");
+	logger_info("a info log message");
+	logger_error("a error log message");
+	logger_notice("a notice log message");
 
-	logger_shutdown(&logger);
+	logger_shutdown();
 	return 0;
 }
 
