@@ -15,13 +15,6 @@
 #include "clib/logger.h"
 
 
-struct _logger{
-	logger_handlers_t * handlers[LOGGER_MAX_HANDLERS];
-	uint nhandlers;
-	char ident[16];
-};
-
-
 #define call_handlers(hander_name, ...) 										\
 	do{																			\
 		int i = 0;																\

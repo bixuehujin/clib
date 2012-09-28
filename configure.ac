@@ -22,6 +22,6 @@ AC_PROG_CC
 AC_PROG_RANLIB
 
 AM_PROG_CC_C_O
-AC_CONFIG_FILES(Makefile src/Makefile include/Makefile include/clib/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile include/Makefile include/clib/Makefile tests/Makefile)
 AC_OUTPUT
 
