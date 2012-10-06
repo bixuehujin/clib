@@ -9,7 +9,8 @@ libclib_a_SOURCES=\
 	sort.c \
 	timer.c \
 	cerror.c \
-	logger.c
+	logger.c \
+	event_loop.c 
 
  
 libclib_a_CFLAGS = -I../include

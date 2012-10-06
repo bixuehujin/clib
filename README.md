@@ -11,6 +11,7 @@ sstring取名自Smart String，意为智能字符串。能够根据需求自动�
 
 * HashTable
 
+一个参考PHP内核的HashTable实现，现仅支持字符串索引，实现了常用的HashTable操作函数。
 
 
 ### 工具模块

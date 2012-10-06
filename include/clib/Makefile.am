@@ -8,6 +8,7 @@ include_HEADERS=bitmap.h\
 		sort.h \
 		sstring.h \
 		timer.h \
-		logger.h
+		logger.h \
+		event_loop.h 
 
 includedir=$(prefix)/include/clib
